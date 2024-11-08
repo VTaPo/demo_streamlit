@@ -23,7 +23,7 @@ st.write("Click 'Generate Responses' to get answers to predefined questions.")
 async def generate_responses():
 
     # Prompt and LLM
-    prompt = hub.pull("rlm/rag-prompt")
+    prompt = '''Answer the following question: {question}'''
     llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
     # Post-processing function
