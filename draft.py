@@ -1,19 +1,11 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 import bs4
 import os
 import asyncio
 import streamlit as st
 from langchain import hub
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader
-from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
 # Load environment variables
 os.environ['OPENAI_API_KEY'] = st.secrets["openai_api_key"]
@@ -29,25 +21,6 @@ st.write("Click 'Generate Responses' to get answers to predefined questions.")
 
 # Define asynchronous function for retrieval and generation
 async def generate_responses():
-    # Load Documents
-    loader = WebBaseLoader(
-        web_paths=("https://lilianweng.github.io/posts/2023-06-23-agent/",),
-        bs_kwargs=dict(
-            parse_only=bs4.SoupStrainer(
-                class_=("post-content", "post-title", "post-header")
-            )
-        ),
-    )
-    docs = loader.load()
-
-    # Split
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    splits = text_splitter.split_documents(docs)
-
-    # Embed
-    vectorstore = Chroma.from_documents(documents=splits, 
-                                        embedding=OpenAIEmbeddings())
-    retriever = vectorstore.as_retriever()
 
     # Prompt and LLM
     prompt = hub.pull("rlm/rag-prompt")
@@ -59,7 +32,7 @@ async def generate_responses():
 
     # Chain
     rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        {"question": RunnablePassthrough()}
         | prompt
         | llm
         | StrOutputParser()
