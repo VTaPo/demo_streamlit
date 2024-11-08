@@ -1,0 +1,13 @@
+langchain_openai
+langchain_core
+langchain_postgres
+langchain_community
+openai
+python-dotenv
+matplotlib
+psycopg[binary]
+psycopg2-binary
+beautifulsoup4
+lxml
+streamlit
+chromadb
