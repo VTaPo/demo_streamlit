@@ -6,6 +6,7 @@ from langchain import hub
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
 
 # Load environment variables
 os.environ['OPENAI_API_KEY'] = st.secrets["openai_api_key"]
@@ -23,7 +24,10 @@ st.write("Click 'Generate Responses' to get answers to predefined questions.")
 async def generate_responses():
 
     # Prompt and LLM
-    prompt = '''Answer the following question: {question}'''
+    prompt = PromptTemplate(
+        input_variables=["question"],
+        template="Answer the following question: {question}"
+    )
     llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
     # Post-processing function
